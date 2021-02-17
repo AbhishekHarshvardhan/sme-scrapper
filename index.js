@@ -5,12 +5,13 @@ const NodeXls = require('node-xls');
 const tool = new NodeXls();
 
 const URL = 'https://www.bizbaya.com';
-const getURI = (page) => URL + '/sme-india/delhi/new-delhi?page=' + page;
+const getURI = (page) => URL + '/sme-india/rajasthan/jaipur?page=' + page;
+const lastPage = 7;
 
 const companies = [];
 
 async function fetchCompanies() {
-  for (let index = 1; index <= 21; index++) {
+  for (let index = 1; index <= lastPage; index++) {
     await fetchData(getURI(index)).then((res) => {
       const html = res.data;
       const $ = cheerio.load(html);
@@ -27,13 +28,13 @@ async function fetchCompanies() {
             telephone: $('.views-field-telephone > .field-content').text(),
             email: $('.views-field-email > .field-content').text(),
             address: $('.views-field-address > .field-content').text(),
-            pinCode: $('.views-field-pin > .field-content').text(),
+            pinCode: $('.views-field-pin > .field-content').text().substr(0, 6),
             products: $(
               '.views-field-products-services > .field-content'
             ).text(),
           });
 
-          if (i === links.length - 1 && index === 21) {
+          if (i === links.length - 1 && index === lastPage) {
             const xls = tool.json2xls(companies);
             fs.writeFileSync('companies.xlsx', xls, 'binary');
           }
